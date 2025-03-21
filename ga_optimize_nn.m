@@ -109,6 +109,7 @@ for generation = 1:ga_params.maxGenerations
     end
 
     % 4. Mutation
+    % 4. Mutation
     for i = ga_params.eliteCount+1:ga_params.populationSize
         for j = 1:total_weights
             if rand < ga_params.mutationRate

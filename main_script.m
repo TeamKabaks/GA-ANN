@@ -1,42 +1,29 @@
-% Main script to run GA optimization on neural network
+% Main script for handwritten digit recognition using GA-optimized NN
 
-fprintf('Hello');
-% Load plant data
-[X, y] = loadPlantData('Plants/plants.data');
-fprintf('Data loaded');
+% Load digit recognition datasets
+[X_train, y_train] = loadDigitData('Original Data\optdigits-orig.tra');
+[X_wd, y_wd] = loadDigitData('Original Data\optdigits-orig.wdep');
+[X_wi, y_wi] = loadDigitData('Original Data\optdigits-orig.windep');
+[X_val, y_val] = loadDigitData('Original Data\optdigits-orig.cv');
+
+fprintf('Data loaded: %d training samples, %d validation samples\n', ...
+        size(X_train, 1), size(X_val, 1));
+
+
 % Define network architecture
-input_layer_size = size(X, 2);    % Number of features (locations)
-hidden_layer_size = 25;           % Number of hidden units
-num_labels = length(unique(y));   % Number of classes (genera)
-lambda = 0.01;                    % Regularization parameter
-
-% Split data into training and testing sets
-rng(1);  % For reproducibility
-n = length(y);
-idx = randperm(n);  % Shuffle indices
-splitIdx = round(0.7 * n);  % 70% training, 30% testing
-
-trainIdx = idx(1:splitIdx);
-testIdx = idx(splitIdx+1:end);
-
-X_train = X(trainIdx, :);
-y_train = y(trainIdx);
-X_test = X(testIdx, :);
-y_test = y(testIdx);
-
-% Display dataset sizes for debugging
-fprintf('Original dataset: %d samples, %d features\n', size(X, 1), size(X, 2));
-fprintf('Training set: %d samples\n', size(X_train, 1));
-fprintf('Testing set: %d samples\n', size(X_test, 1));
+input_layer_size = size(X_train, 2);   % Number of features (pixels)
+hidden_layer_size = 50;                % Adjust based on complexity
+num_labels = 10;                       % 10 digits (0-9)
+lambda = 0.1;                          % Regularization parameter
 
 % Configure GA parameters
 ga_params = struct();
-ga_params.populationSize = 50;
+ga_params.populationSize = 100;        % Increased for more diversity
 ga_params.maxGenerations = 100;
 ga_params.crossoverRate = 0.8;
-ga_params.mutationRate = 0.03;
-ga_params.eliteCount = 2;
-ga_params.tournamentSize = 3;
+ga_params.mutationRate = 0.05;         % Slightly increased for more exploration
+ga_params.eliteCount = 3;
+ga_params.tournamentSize = 5;
 
 % Run GA optimization
 fprintf('Starting Genetic Algorithm optimization...\n');
@@ -52,21 +39,22 @@ Theta1 = reshape(best_nn_params(1:hidden_layer_size * (input_layer_size + 1)), .
 Theta2 = reshape(best_nn_params((1 + (hidden_layer_size * (input_layer_size + 1))):end), ...
                 num_labels, (hidden_layer_size + 1));
 
-% Evaluate on test set
-pred = predict(Theta1, Theta2, X_test);
-accuracy = mean(double(pred == y_test)) * 100;
-fprintf('Test set accuracy: %.2f%%\n', accuracy);
+% Evaluate on validation set
+val_pred = predict(Theta1, Theta2, X_val);
+val_accuracy = mean(double(val_pred == y_val)) * 100;
+fprintf('Validation set accuracy: %.2f%%\n', val_accuracy);
 
-% Create confusion matrix
-confMat = zeros(num_labels, num_labels);
-for i = 1:length(y_test)
-    confMat(y_test(i), pred(i)) = confMat(y_test(i), pred(i)) + 1;
-end
+% Evaluate on writer-dependent set
+wd_pred = predict(Theta1, Theta2, X_wd);
+wd_accuracy = mean(double(wd_pred == y_wd)) * 100;
+fprintf('Writer-dependent accuracy: %.2f%%\n', wd_accuracy);
 
-% Display confusion matrix
-figure;
-imagesc(confMat);
-colorbar;
-title('Confusion Matrix');
-xlabel('Predicted');
-ylabel('Actual');
+% Evaluate on writer-independent set
+wi_pred = predict(Theta1, Theta2, X_wi);
+wi_accuracy = mean(double(wi_pred == y_wi)) * 100;
+fprintf('Writer-independent accuracy: %.2f%%\n', wi_accuracy);
+
+% Create confusion matrices
+plotConfusionMatrix(y_val, val_pred, 'Validation');
+plotConfusionMatrix(y_wd, wd_pred, 'Writer-Dependent');
+plotConfusionMatrix(y_wi, wi_pred, 'Writer-Independent');
