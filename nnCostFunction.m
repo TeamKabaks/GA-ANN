@@ -43,7 +43,7 @@ h = sigmoid(z3);
 
 Y = zeros(m, num_labels);
 for i = 1 : m
-  Y(i,:) = y_temp(y(i) + 1, :);
+  Y(i,:) = y_temp(y(i), :);
 end
 
 J = sum(sum((-Y) .* log(h) - (1 - Y) .* log(1 - h)))/m;

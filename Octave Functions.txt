@@ -1,0 +1,21 @@
+Octave functions:
+
+1.) fopen('filename', 'mode'); - opens a file for reading or writing.
+1.) fclose(filevariable); - close an open file.
+1.) fget1(filevariable); - reads a line from a file as a string.
+1.) fprintf('message', values) - displays text similar to printf in C.
+1.) error('message'); - display error message and stop program execution.
+1.) warning('message'); - display warning message but does not stop execution.
+1.) assert('message'); - check a condition and throw an error if false.
+1.) zeros(n, m); - create an n-by-m array filled with zeros.
+1.) int32(variable); or int64(variable) - convert variable to integer.
+1.) num2str(numvalue); - convert number to string.
+1.) str2num(stringvalue); - convert string to number array.
+1.) str2double(stringvariable); - convert a string to a numeric value.
+1.) strsplit(stringvariable); - splits a string into substrings based on a delimiter (i.e. comma or (default) whitespaces).
+1.) disp(variable); - display variable value.
+1.) './'/'.*','.^' - element-wise division, multiplication, and exponentiation, respectively.
+1.) variable' - transposes the matrix-turning rows into columns and vice-versa.
+1.) inv(matrix) - inverses a square matrix.
+1.) size(matrix, 1-row or 2-column) - dimensions of a matrix or array.
+1.) 
