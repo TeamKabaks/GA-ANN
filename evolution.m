@@ -1,17 +1,19 @@
-function [new_pop, best_fit] = evolution(population, A_train, B_train, input, hidden, unq, lambda, pop, crossrate, muterate, X_test, Y_test, Theta1, Theta2)
+function [new_pop, best_fit] = evolution(population, A_train, B_train, input, hidden, unq, lambda, pop, crossrate, muterate)
   fitness = zeros(pop, 1);
   for i = 1:pop
-    fitness(i) = nnCostFunction([Theta1(:); Theta2(:)], input, hidden, unq, A_train, B_train, lambda);
+    current_params = population(i, :);
+    fitness(i) = nnCostFunction(current_params, input, hidden, unq, A_train, B_train, lambda);
   end
 
   fit = sort(fitness);
 
   parents = zeros(pop, size(population, 2));
+
   for i = 1:pop
-    candidates = randperm(pop, 2);
-    fitval = fitness(candidates);
+    candidate = randperm(pop, 2);
+    fitval = fit(candidate);
     [minimum, index] = min(fitval);
-    fit_parent = population(candidates(index), :);
+    fit_parent = population(candidate(index), :);
     parents(i, :) = fit_parent;
   end
 
