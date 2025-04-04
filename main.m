@@ -1,78 +1,7 @@
-function [train_data, train_labels, val_data, val_labels, wdep_test_data, wdep_test_labels, windep_test_data, windep_test_labels] = loadData(train_file, wdep_test_file, windep_test_file)
-    % Load training data (optdigits-orig.dat)
-    raw_train = dlmread(train_file);
-    train_samples = floor(size(raw_train, 1) / 33);
-    fprintf('Processing %d training samples...\n', train_samples);
+function main(train_file, wdep_test_file, windep_test_file)
+  [train_data, train_labels, val_data, val_labels, wdep_test_data, wdep_test_labels, windep_test_data, windep_test_labels] = loadData(train_file, wdep_test_file, windep_test_file)
 
-    % Load writer-dependent test data (optdigits-orig.wdep)
-    raw_wdep_test = dlmread(wdep_test_file);
-    wdep_test_samples = floor(size(raw_wdep_test, 1) / 33);
-    fprintf('Processing %d writer-dependent test samples...\n', wdep_test_samples);
-
-    % Load writer-independent test data (optdigits-orig.windep)
-    raw_windep_test = dlmread(windep_test_file);
-    windep_test_samples = floor(size(raw_windep_test, 1) / 33);
-    fprintf('Processing %d writer-independent test samples...\n', windep_test_samples);
-
-    % Initialize matrices and labels for all sets
-    train_matrices = zeros(train_samples, 32*32);
-    train_labels = zeros(train_samples, 1);
-    wdep_test_matrices = zeros(wdep_test_samples, 32*32);
-    wdep_test_labels = zeros(wdep_test_samples, 1);
-    windep_test_matrices = zeros(windep_test_samples, 32*32);
-    windep_test_labels = zeros(windep_test_samples, 1);
-
-    % Process training data
-    for i = 1:train_samples
-        start_idx = (i - 1) * 33 + 1;
-        sample = raw_train(start_idx:start_idx+31, :)';
-        train_matrices(i, :) = sample(:)';
-        train_labels(i) = raw_train(start_idx+32, 1);
-    end
-
-    % Process writer-dependent test data
-    for i = 1:wdep_test_samples
-        start_idx = (i - 1) * 33 + 1;
-        sample = raw_wdep_test(start_idx:start_idx+31, :)';
-        wdep_test_matrices(i, :) = sample(:)';
-        wdep_test_labels(i) = raw_wdep_test(start_idx+32, 1);
-    end
-
-    % Process writer-independent test data
-    for i = 1:windep_test_samples
-        start_idx = (i - 1) * 33 + 1;
-        sample = raw_windep_test(start_idx:start_idx+31, :)';
-        windep_test_matrices(i, :) = sample(:)';
-        windep_test_labels(i) = raw_windep_test(start_idx+32, 1);
-    end
-
-    % Normalize all datasets
-    [train_matrices, min_val, max_val] = normalize_data(train_matrices);
-    wdep_test_matrices = (wdep_test_matrices - min_val) / (max_val - min_val + eps);
-    windep_test_matrices = (windep_test_matrices - min_val) / (max_val - min_val + eps);
-
-    % Further normalize each sample if there's sufficient contrast
-    train_matrices = normalize_samples(train_matrices);
-    wdep_test_matrices = normalize_samples(wdep_test_matrices);
-    windep_test_matrices = normalize_samples(windep_test_matrices);
-
-    total_samples = size(train_matrices, 1);
-    train_end = floor(0.5 * total_samples);       % First 50% for training
-    val_end = train_end + floor(0.5 * total_samples); % Next 50% for validation
-
-    % Assign splits (in original order)
-    train_data = train_matrices(1:train_end, :);
-    val_labels = train_labels(train_end+1:val_end);
-    train_labels = train_labels(1:train_end);
-    val_data = train_matrices(train_end+1:val_end, :);
-
-    % Assign the test sets
-    wdep_test_data = wdep_test_matrices;
-    wdep_test_labels = wdep_test_labels;
-    windep_test_data = windep_test_matrices;
-    windep_test_labels = windep_test_labels;
-
-    fprintf('Data loaded successfully:\n');
+  fprintf('Data loaded successfully:\n');
   fprintf('  - Training set: %d samples\n', size(train_data, 1));
   fprintf('  - Validation set: %d samples\n', size(val_data, 1));
   fprintf('  - Writer-dependent test set: %d samples\n', size(wdep_test_data, 1));
@@ -85,10 +14,9 @@ function [train_data, train_labels, val_data, val_labels, wdep_test_data, wdep_t
 
   popu = population;
 
-  best_fitness_history = zeros(100,1);
-  avg_fitness_history = zeros(100,1);
+  best_fitness_history = zeros(200,1);
 
-  for i=1:100
+  for i=1:200
     [new_pop, best_fit] = evolution(popu, train_data, train_labels, input, hidden, output, lambda, pop_size, crossrate, muterate);
     best_fitness_history(i) = best_fit;
     popu = new_pop;
@@ -99,7 +27,7 @@ function [train_data, train_labels, val_data, val_labels, wdep_test_data, wdep_t
   for i = 1:pop_size
       fitness(i) = nnCostFunction(popu(i,:), input, hidden, output, train_data, train_labels, lambda);
   end
-  avg_fitness_history(i) = mean(fitness);
+  %avg_fitness_history(i) = mean(fitness);
 
   % getting the best solution
   [~, best_idx] = min(fitness);
@@ -199,21 +127,4 @@ function printConfusionMatrix(true_labels, pred_labels)
     accuracy = conf_mat(c,c) / sum(conf_mat(c,:)) * 100;
     fprintf('Class %d: %.1f%%\n', classes(c), accuracy);
   end
-end
-
-function [normalized_data, min_val, max_val] = normalize_data(data)
-    min_val = min(data(:));
-    max_val = max(data(:));
-    normalized_data = (data - min_val) / (max_val - min_val + eps);
-end
-
-function normalized_samples = normalize_samples(data)
-    normalized_samples = data;
-    for i = 1:size(data, 1)
-        curr_min = min(data(i,:));
-        curr_max = max(data(i,:));
-        if (curr_max - curr_min) > 0.1 % Only normalize if there's sufficient contrast
-            normalized_samples(i,:) = (data(i,:) - curr_min) / (curr_max - curr_min + eps);
-        end
-    end
 end

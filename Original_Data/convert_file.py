@@ -1,7 +1,7 @@
 filepath = "C:/Users/IDEAPAD/Documents/GitHub/GA-ANN/Original_Data/"
 
-input_filename = filepath + "optdigits-orig.cv"
-output_filename = filepath + "cross_valid.dat"
+input_filename = filepath + "writer-dependent.txt"
+output_filename = filepath + "writer-dependent.dat"
 
 with open(input_filename, "r") as infile, open(output_filename, "w") as outfile:
     matrix = []  # Store the current 32x32 matrix

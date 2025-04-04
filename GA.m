@@ -1,26 +1,19 @@
-function [population, pop, crossrate, muterate, lambda] = GA(initt1, initt2, A_train, B_train, samples)
-  pop = min(200, samples);
-  crossrate = 0.8;
-  muterate = 0.2;
+function [population, pop_size, crossrate, muterate, lambda] = GA(initt1, initt2, initt3, train_data, train_labels, samples)
+  pop_size = 100;
+  crossrate = 0.75;
+  muterate = 0.3;
 
-  lambda = 0.1;
+  lambda = 1;
 
-  population = zeros(pop, numel(initt1) + numel(initt2));
+  weight = [initt1(:); initt2(:)];
 
-  for i = 1:pop
-
-    input_size = size(initt1, 2) - 1; % Subtract bias
-    hidden_size = size(initt1, 1);
-    output_size = size(initt2, 1);
-
-    scale1 = sqrt(6/(input_size + hidden_size));
-    scale2 = sqrt(6/(hidden_size + output_size));
-
-    population(i,:) = [rand(size(initt1(:)))', rand(size(initt2(:)))'];
+  population = zeros(pop_size, length(weight));
+  for i = 1:pop_size
+    population(i, :) = weight + randn(size(weight)) * 0.1;
   end
 
   fprintf('Genetic Algorithm Parameters:\n');
-  fprintf('Population size: %d\n', pop);
+  fprintf('Population size: %d\n', pop_size);
   fprintf('Crossover rate: %.2f\n', crossrate);
   fprintf('Mutation rate: %.2f\n', muterate);
 end
