@@ -15,7 +15,7 @@ function loadData()
   [input, hidden, unq, initt1, initt2] = ANN(A_train, B_train);
   [population, pop, crossrate, muterate] = GA(initt1, initt2, A_train, B_train);
   init_time = toc;
-  fprintf('Initialization time: %.10fs\n\n', init_time);
+  fprintf('Initialization time: %.10fs\n', init_time);
 
   %disp('Normalized Training Data:');
   %disp(A_train(5, :));
@@ -37,7 +37,7 @@ function loadData()
     popu = new_pop;
     best_costs(i) = best_fit;
     time_per_generation(i) = toc(gen_tic);
-    fprintf('Generation %d | Best Fitness: %.5f | Runtime: %.10fs', i, best_fit, time_per_generation(i));
+    fprintf('\nGeneration %d | Best Fitness: %.5f | Runtime: %.10fs', i, best_fit, time_per_generation(i));
   endfor
 
   total_time = toc(totalics);
