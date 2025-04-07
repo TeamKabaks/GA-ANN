@@ -41,7 +41,7 @@ function loadData()
   endfor
 
   total_time = toc(totalics);
-  fprintf('\nTotal Runtime: %.10fs\n', total_time);
+  fprintf('\n\nTotal Runtime: %.10fs\n', total_time);
   fprintf('\n=== Parameters Used ===\n');
   fprintf('Population Count: %d\n', pop);
   fprintf('Number of Generations: %d\n', gens);
