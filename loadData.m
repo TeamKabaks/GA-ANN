@@ -47,6 +47,9 @@ function loadData()
   fprintf('Number of Generations: %d\n', gens);
   fprintf('Crossover Rate: %.2f%%\n', crossrate * 100);
   fprintf('Mutation Rate: %.2f%%\n', muterate * 100);
+  fprintf('Number of Input Neurons: %d\n', input);
+  fprintf('Number of Hidden Neurons: %d\n', hidden);
+  fprintf('Number of Output Neurons: %d\n', unq);
   fprintf('Average Time per Generation: %.10fs\n', mean(time_per_generation));
   accuracy(popu(1, :), input, hidden, unq, X_test, Y_test);
 end
