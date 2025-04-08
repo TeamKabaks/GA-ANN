@@ -32,7 +32,7 @@ function [new_pop, best_fit] = evolution(population, A_train, B_train, input, hi
     end
 
     [sorted_fit, sorted_idx] = sort(fitness);
-    elite_count = max(1, floor(0.05 * pop));
+    elite_count = max(2, floor(0.05 * pop));
     offspring(1:elite_count,:) = population(sorted_idx(1:elite_count), :);
 
     new_pop = offspring;
