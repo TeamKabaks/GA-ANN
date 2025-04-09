@@ -1,4 +1,9 @@
 function loadData()
+  output_DIR = 'C:\Users\IDEAPAD\Documents\GitHub\GA-ANN\Graphs';
+  if ~exist(output_DIR, 'dir')
+    mkdir(output_DIR);
+  end
+
   totalics = tic;
   tra_data = dlmread('optdigits.tra', ',');
   tes_data = dlmread('optdigits.tes', ',');
@@ -41,7 +46,7 @@ function loadData()
   endfor
 
   % plotting the best costs (fitness)
-  plotFitness(best_costs);
+  plotFitness(best_costs, output_DIR);
 
   total_time = toc(totalics);
   fprintf('\n\nTotal Runtime: %.10fs\n', total_time);
@@ -58,48 +63,57 @@ function loadData()
   % added [acc, predictions] for confusion matrix
   [acc, predictions] = accuracy(popu(1, :), input, hidden, unq, X_test, Y_test);
 
-  plotConfusionMatrix(Y_test, predictions, unq);
+  plotConfusionMatrix(Y_test, predictions, unq, output_DIR);
+  title(sprintf('Confusion Matrix (Accuracy: %.2f%%)', acc));
+
 end
 
-function plotFitness(best_costs)
-  figure;
+function plotFitness(best_costs, output)
+  fitness_fig = figure('Visible', 'off');
   plot(1:length(best_costs), best_costs, 'b-', 'LineWidth', 2);
   title('Fitness over Generations');
   xlabel('Generation');
   ylabel('Best Fitness');
   grid on;
   set(gca, 'FontSize', 12);
+
+  saveas(fitness_fig, fullfile(output, 'fitness_graph_second.png'));
+  saveas(fitness_fig, fullfile(output, 'fitness_graph_second.fig'));
+  close(fitness_fig);
+
 end
 
-function plotConfusionMatrix(true_labels, predicted_labels, num_classes)
-  % Create confusion matrix
+function plotConfusionMatrix(true_labels, predicted_labels, num_classes, output)
   cm = zeros(num_classes, num_classes);
   for i = 1:length(true_labels)
     cm(true_labels(i), predicted_labels(i)) = cm(true_labels(i), predicted_labels(i)) + 1;
   end
 
-  % Normalize by row (true labels)
   cm_normalized = cm ./ sum(cm, 2);
 
-  figure;
+  cm_fig = figure('Visible', 'off');
   imagesc(cm_normalized);
-  colormap(flipud(gray));  % Darker = higher values
+  colormap(flipud(gray));
   colorbar;
   title('Normalized Confusion Matrix');
   xlabel('Predicted Label');
   ylabel('True Label');
 
-  % Add text annotations
   for i = 1:num_classes
     for j = 1:num_classes
         if cm_normalized(i, j) > 0.5
-            text_color = 'w'; % white for high values
+            text_color = 'w';
         else
-            text_color = 'k'; % black for low values
+            text_color = 'k';
         end
         text(j, i, sprintf('%.2f', cm_normalized(i, j)), ...
              'HorizontalAlignment', 'center', ...
              'Color', text_color);
     end
   end
+
+
+  saveas(cm_fig, fullfile(output, 'confusion_matrix_second.png'));
+  saveas(cm_fig, fullfile(output, 'confusion_matrix_second.fig'));
+  close(cm_fig);
 end
