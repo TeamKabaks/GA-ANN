@@ -32,7 +32,7 @@ function loadData()
   %disp(Y_test(5, :));
 
   popu = population;
-  gens = 500;
+  gens = 5;
 
   time_per_generation = zeros(gens, 1);
   best_costs = zeros(gens, 1);
@@ -99,6 +99,14 @@ function plotConfusionMatrix(true_labels, predicted_labels, num_classes, output)
   xlabel('Predicted Label');
   ylabel('True Label');
 
+  % Set the ticks and labels
+  tick_positions = 1:num_classes;
+  tick_labels = arrayfun(@num2str, 0:num_classes-1, 'UniformOutput', false);
+  xticks(tick_positions);
+  yticks(tick_positions);
+  xticklabels(tick_labels);
+  yticklabels(tick_labels);
+
   for i = 1:num_classes
     for j = 1:num_classes
         if cm_normalized(i, j) > 0.5
@@ -111,7 +119,6 @@ function plotConfusionMatrix(true_labels, predicted_labels, num_classes, output)
              'Color', text_color);
     end
   end
-
 
   saveas(cm_fig, fullfile(output, 'confusion_matrix_second.png'));
   saveas(cm_fig, fullfile(output, 'confusion_matrix_second.fig'));
