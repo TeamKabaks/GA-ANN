@@ -1,4 +1,4 @@
-function accuracy(best_weights, input_size, hidden_size, output_size, X_test, Y_test)
+function [accuracy, predictions] = accuracy(best_weights, input_size, hidden_size, output_size, X_test, Y_test)
   theta1_elems = hidden_size * (input_size + 1);
   theta2_elems = output_size * (hidden_size + 1);
 
@@ -12,4 +12,5 @@ function accuracy(best_weights, input_size, hidden_size, output_size, X_test, Y_
 
   fprintf('\nPrediction Accuracy on Test Set: %.2f%% (%d/%d correct)\n', accuracy, correct, length(Y_test));
 end
+
 

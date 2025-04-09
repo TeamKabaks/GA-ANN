@@ -27,7 +27,7 @@ function loadData()
   %disp(Y_test(5, :));
 
   popu = population;
-  gens = 100;
+  gens = 10;
 
   time_per_generation = zeros(gens, 1);
   best_costs = zeros(gens, 1);
@@ -40,6 +40,9 @@ function loadData()
     fprintf('\nGeneration %d | Best Fitness: %.5f | Runtime: %.10fs', i, best_fit, time_per_generation(i));
   endfor
 
+  % plotting the best costs (fitness)
+  plotFitness(best_costs);
+
   total_time = toc(totalics);
   fprintf('\n\nTotal Runtime: %.10fs\n', total_time);
   fprintf('\n=== Parameters Used ===\n');
@@ -47,6 +50,56 @@ function loadData()
   fprintf('Number of Generations: %d\n', gens);
   fprintf('Crossover Rate: %.2f%%\n', crossrate * 100);
   fprintf('Mutation Rate: %.2f%%\n', muterate * 100);
+  fprintf('Number of Input Neurons: %d\n', input);
+  fprintf('Number of Hidden Neurons: %d\n', hidden);
+  fprintf('Number of Output Neurons: %d\n', unq);
   fprintf('Average Time per Generation: %.10fs\n', mean(time_per_generation));
-  accuracy(popu(1, :), input, hidden, unq, X_test, Y_test);
+
+  % added [acc, predictions] for confusion matrix
+  [acc, predictions] = accuracy(popu(1, :), input, hidden, unq, X_test, Y_test);
+
+  plotConfusionMatrix(Y_test, predictions, unq);
+end
+
+function plotFitness(best_costs)
+  figure;
+  plot(1:length(best_costs), best_costs, 'b-', 'LineWidth', 2);
+  title('Fitness over Generations');
+  xlabel('Generation');
+  ylabel('Best Fitness');
+  grid on;
+  set(gca, 'FontSize', 12);
+end
+
+function plotConfusionMatrix(true_labels, predicted_labels, num_classes)
+  % Create confusion matrix
+  cm = zeros(num_classes, num_classes);
+  for i = 1:length(true_labels)
+    cm(true_labels(i), predicted_labels(i)) = cm(true_labels(i), predicted_labels(i)) + 1;
+  end
+
+  % Normalize by row (true labels)
+  cm_normalized = cm ./ sum(cm, 2);
+
+  figure;
+  imagesc(cm_normalized);
+  colormap(flipud(gray));  % Darker = higher values
+  colorbar;
+  title('Normalized Confusion Matrix');
+  xlabel('Predicted Label');
+  ylabel('True Label');
+
+  % Add text annotations
+  for i = 1:num_classes
+    for j = 1:num_classes
+        if cm_normalized(i, j) > 0.5
+            text_color = 'w'; % white for high values
+        else
+            text_color = 'k'; % black for low values
+        end
+        text(j, i, sprintf('%.2f', cm_normalized(i, j)), ...
+             'HorizontalAlignment', 'center', ...
+             'Color', text_color);
+    end
+  end
 end

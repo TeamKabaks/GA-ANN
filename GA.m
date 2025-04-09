@@ -1,7 +1,7 @@
 function [population, pop, crossrate, muterate] = GA(initt1, initt2, A_train, B_train)
-  pop = 100;
+  pop = 200;
   crossrate = 0.75;
-  muterate = 0.10;
+  muterate = 0.05;
 
   weight = [initt1(:); initt2(:)];
 
