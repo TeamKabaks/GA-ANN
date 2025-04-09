@@ -27,7 +27,7 @@ function loadData()
   %disp(Y_test(5, :));
 
   popu = population;
-  gens = 10;
+  gens = 500;
 
   time_per_generation = zeros(gens, 1);
   best_costs = zeros(gens, 1);
