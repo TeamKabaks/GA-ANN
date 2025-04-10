@@ -1,12 +1,12 @@
 function loadData()
-  output_DIR = 'C:\Users\IDEAPAD\Documents\GitHub\GA-ANN\Graphs';
+  output_DIR = 'C:\Users\IDEAPAD\Documents\GitHub\GA-ANN\Graphs\Pop & Gen';
   if ~exist(output_DIR, 'dir')
     mkdir(output_DIR);
   end
 
   totalics = tic;
-  tra_data = dlmread('optdigits.tra', ',');
-  tes_data = dlmread('optdigits.tes', ',');
+  tra_data = dlmread('Dataset\optdigits.tra', ',');
+  tes_data = dlmread('Dataset\optdigits.tes', ',');
 
   tic;
   A_train = tra_data(:, 1:64) / 16.0;
@@ -32,7 +32,7 @@ function loadData()
   %disp(Y_test(5, :));
 
   popu = population;
-  gens = 5;
+  gens = 1;
 
   time_per_generation = zeros(gens, 1);
   best_costs = zeros(gens, 1);
@@ -42,7 +42,8 @@ function loadData()
     popu = new_pop;
     best_costs(i) = best_fit;
     time_per_generation(i) = toc(gen_tic);
-    fprintf('\nGeneration %d | Best Fitness: %.5f | Runtime: %.10fs', i, best_fit, time_per_generation(i));
+    [acc, correct, prediction] = accuracy(popu(1, :), input, hidden, unq, X_test, Y_test);
+    fprintf('\nGeneration %d | Best Fitness: %.5f | Accuracy: %.2f%% (%d/%d correct) | Runtime: %.10fs', i, best_fit, acc, correct, length(Y_test), time_per_generation(i));
   endfor
 
   % plotting the best costs (fitness)
@@ -61,9 +62,7 @@ function loadData()
   fprintf('Average Time per Generation: %.10fs\n', mean(time_per_generation));
 
   % added [acc, predictions] for confusion matrix
-  [acc, predictions] = accuracy(popu(1, :), input, hidden, unq, X_test, Y_test);
-
-  plotConfusionMatrix(Y_test, predictions, unq, output_DIR);
+  plotConfusionMatrix(Y_test, prediction, unq, output_DIR);
   title(sprintf('Confusion Matrix (Accuracy: %.2f%%)', acc));
 
 end
